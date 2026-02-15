@@ -1,27 +1,29 @@
 @import "tailwindcss";
 
 @theme {
-  /* 核心主色：橙色 (保持不变，用于按钮) */
-  --color-primary-500: #f97316;
-  --color-primary-600: #ea580c;
-
-  /* 新增：星球背景色 (深紫) */
-  --color-planet-bg: #2D1B4E; 
-  /* 新增：卡片背景色 (稍亮的紫，带透明度) */
-  --color-planet-card: #432C7A; 
-  /* 新增：文字颜色 */
-  --color-planet-text: #F3F0FF;
-  
-  /* 定义一个专门的圆角大小 */
-  --radius-card: 1.5rem; /* 24px */
-  --color-login-red: #FF3D57; /* 登录按钮红 */
-  --color-login-purple: #3D2E5F; /* 左侧背景紫 */
-  --color-input-gray: #F5F5F7; /* 输入框背景灰 */
+  --color-primary-500: #20b9de;
+  --color-primary-600: #0f95c2;
+  --radius-card: 1.5rem;
 }
 
-/* 全局重置：默认背景变深 */
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
 body {
-  background-color: var(--color-planet-bg);
-  color: var(--color-planet-text);
-  font-family: 'Nunito', sans-serif; /* 如果有圆润字体更好 */
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Trebuchet MS", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(180deg, #dff8ff 0%, #b8e6ff 45%, #8dc8ff 100%);
+  color: #08314c;
 }

@@ -1,4 +1,5 @@
 import request from '@/utils/request';
+import type { AxiosProgressEvent } from 'axios';
 import type { PaginatedData } from '@/types/api';
 import type { Video, Comment } from '@/types/entity';
 
@@ -35,7 +36,7 @@ export const videoAPI = {
   // === 视频基础 ===
 
   // 获取视频列表
-  getVideoList: (params: { page: number; page_size: number; category?: string }) => 
+  getVideoList: (params: { page: number; page_size: number; category?: string; user_id?: number | string }) => 
     request.get<any, PaginatedData<Video>>('/videos', { params }),
 
   // 获取我的视频
@@ -47,18 +48,29 @@ export const videoAPI = {
     request.get<any, Video>(`/videos/${id}`),
 
   // 上传视频
-  uploadVideo: (file: File) => {
+  uploadVideo: (file: File, options?: { onProgress?: (percent: number) => void }) => {
     const formData = new FormData();
-    formData.append('file', file);
+    const fieldName =
+      (import.meta.env.VITE_VIDEO_UPLOAD_FIELD as string | undefined) || 'video';
+    formData.append(fieldName, file);
     return request.post<any, Video>('/videos/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
       timeout: 600000, 
+      onUploadProgress: (event: AxiosProgressEvent) => {
+        if (!event.total) return;
+        const percent = Math.round((event.loaded * 100) / event.total);
+        options?.onProgress?.(percent);
+      },
     });
   },
 
   // 发布/更新视频
-  publishVideo: (id: number | string, data: { title: string; description: string }) => 
-    request.put<any, Video>(`/videos/${id}`, data),
+  publishVideo: (id: number | string, data: { title: string; description: string }) =>
+    request.post<any, Video>('/videos/publish', {
+      id,
+      video_id: id,
+      ...data,
+    }),
 
   // 删除视频
   deleteVideo: (id: number | string) => 

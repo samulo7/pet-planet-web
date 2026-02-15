@@ -6,10 +6,24 @@ import {
 } from 'lucide-react';
 import { videoAPI, commentAPI } from '@/api/video';
 import type { Video, Comment } from '@/types/entity';
+import { resolveAssetUrl } from '@/utils/asset';
 
 const VideoDetailPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const fallbackAvatar = 'https://placehold.co/100x100?text=U';
+  const fallbackSelfAvatar = 'https://placehold.co/100x100?text=Me';
+  const storedUserInfo = (() => {
+    const raw = localStorage.getItem('user_info');
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  })();
+  const currentUserAvatar =
+    resolveAssetUrl(storedUserInfo?.avatar || storedUserInfo?.avatar_url) || fallbackSelfAvatar;
   
   // === 状态定义 ===
   const [video, setVideo] = useState<Video | null>(null);
@@ -200,6 +214,8 @@ const VideoDetailPage: React.FC = () => {
 
   if (loading) return <div className="min-h-screen bg-planet-bg flex items-center justify-center text-purple-300"><Loader2 className="animate-spin" /> 正在连接星球信号...</div>;
   if (!video) return null;
+  const posterUrl = resolveAssetUrl(video.cover_url);
+  const videoSrc = resolveAssetUrl(video.transcoded_url || video.video_url);
 
   return (
     <div className="min-h-screen bg-planet-bg text-planet-text p-6 pt-0">
@@ -212,7 +228,12 @@ const VideoDetailPage: React.FC = () => {
           <div className="relative group">
              <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-primary-600 rounded-[2rem] blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
              <div className="relative bg-black rounded-[2rem] overflow-hidden shadow-2xl aspect-video border border-white/10">
-               <video src={video.transcoded_url || video.video_url} poster={video.cover_url} controls className="w-full h-full object-contain" />
+               <video
+                 src={videoSrc}
+                 poster={posterUrl || undefined}
+                 controls
+                 className="w-full h-full object-contain"
+               />
              </div>
           </div>
 
@@ -254,7 +275,17 @@ const VideoDetailPage: React.FC = () => {
           <div className="bg-planet-card/50 rounded-2xl p-4 flex items-center justify-between border border-white/5">
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => video.user?.id && navigate(`/user/${video.user.id}`)}>
               <div className="w-12 h-12 rounded-full border-2 border-primary-500 p-0.5 overflow-hidden">
-                 <img src={video.user?.avatar || "https://placehold.co/100x100?text=U"} className="w-full h-full object-cover" alt="avatar"/>
+                 <img
+                   src={
+                     resolveAssetUrl((video.user as any)?.avatar || (video.user as any)?.avatar_url) ||
+                     fallbackAvatar
+                   }
+                   className="w-full h-full object-cover"
+                   alt="avatar"
+                   onError={(e) => {
+                     e.currentTarget.src = fallbackAvatar;
+                   }}
+                 />
               </div>
               <div>
                 <h3 className="font-bold text-base hover:text-primary-400 transition">{video.user?.nickname || '神秘铲屎官'}</h3>
@@ -278,7 +309,13 @@ const VideoDetailPage: React.FC = () => {
             {/* 发送框 */}
             <div className="flex gap-4 mb-8">
                <div className="w-12 h-12 rounded-full bg-purple-800 overflow-hidden flex-shrink-0">
-                  <img src={localStorage.getItem('user_avatar') || "https://placehold.co/100x100?text=Me"} className="w-full h-full object-cover" />
+                  <img
+                    src={currentUserAvatar}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = fallbackSelfAvatar;
+                    }}
+                  />
                </div>
                <div className="flex-1 relative">
                 <textarea 
@@ -302,7 +339,17 @@ const VideoDetailPage: React.FC = () => {
                {comments.map((comment) => (
                   <div key={comment.id} className="flex gap-4 group">
                      <div className="w-10 h-10 rounded-full bg-purple-800 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                        <img src={comment.user?.avatar || "https://placehold.co/100x100?text=U"} className="w-full h-full object-cover" />
+                        <img
+                          src={
+                            resolveAssetUrl(
+                              (comment.user as any)?.avatar || (comment.user as any)?.avatar_url
+                            ) || fallbackAvatar
+                          }
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = fallbackAvatar;
+                          }}
+                        />
                      </div>
                      <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">

@@ -31,7 +31,7 @@ export const videoAPI = {
 
   // 发布视频
   publishVideo: (id: number | string, data: { title: string; description: string }) => 
-    request.put(`/videos/${id}`, data),
+    request.post('/videos/publish', { id, video_id: id, ...data }),
 
   // 删除视频
   deleteVideo: (id: number | string) => 

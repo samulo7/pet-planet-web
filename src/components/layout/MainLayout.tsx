@@ -1,37 +1,28 @@
 import React from 'react';
-import { Header } from './Header';
 import { Outlet } from 'react-router-dom';
+
 import LoginModal from '../LoginModal';
+import { Header } from './Header';
 
 const MainLayout: React.FC = () => {
   return (
-    // ✨ 1. 背景升级：
-    // - bg-[#0F0F1A]: 与 HomePage 保持一致的深黑背景，消除断层
-    // - text-white: 全局文字默认白色
-    // - selection:xxx: 选中文本时的颜色改为主题色，细节加分
-    <div className="min-h-screen bg-[#0F0F1A] font-sans relative text-white selection:bg-orange-500 selection:text-white overflow-x-hidden">
-      
-      {/* ✨ 2. 全局背景氛围光 (可选) */}
-      {/* 这是一个固定在顶部的淡淡紫色光晕，让顶部 Header 区域不那么死板，同时呼应星球主题 */}
-      <div className="fixed top-[-20%] left-[20%] right-[20%] h-[500px] bg-purple-900/20 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+    <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-b from-[#dff7ff] via-[#bde6ff] to-[#8ecbff] text-slate-900">
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute left-1/2 top-[-220px] h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-white/45 blur-[90px]" />
+        <div className="absolute left-[-80px] top-40 h-72 w-72 rounded-full bg-cyan-200/55 blur-[70px]" />
+        <div className="absolute bottom-[-120px] right-[-40px] h-96 w-96 rounded-full bg-sky-300/55 blur-[95px]" />
+      </div>
 
-      {/* ✨ 3. 内容容器 */}
-      {/* 限制最大宽度，确保在大屏幕下内容居中，不会贴边 */}
-      <div className="w-full px-6 md:px-10">
-        
-        {/* Header 位于顶部 */}
-        <div className="pt-6">
-           <Header />
+      <div className="mx-auto w-full max-w-[1400px] px-4 pb-10 md:px-8">
+        <div className="pt-5 md:pt-6">
+          <Header />
         </div>
 
-        {/* 登录弹窗 (全局单例) */}
         <LoginModal />
 
-        {/* 页面主体内容 */}
-        <main className="relative z-10 pb-12 min-h-[calc(100vh-150px)]">
+        <main className="relative z-10 min-h-[calc(100vh-150px)] pb-10">
           <Outlet />
         </main>
-        
       </div>
     </div>
   );

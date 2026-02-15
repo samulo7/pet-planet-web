@@ -1,17 +1,23 @@
-// src/api/user.ts
+﻿// src/api/user.ts
 import request from '@/utils/request';
-import type { User } from '@/types/entity';
 
 export const userAPI = {
-  // 获取用户公开资料 (个人主页用)
-  getUserProfile: (id: number | string) => 
-    request.get<any, User>(`/users/${id}`),
+  // 鑾峰彇鐢ㄦ埛鍏紑璧勬枡 (涓汉涓婚〉鐢?
+  getUserProfile: async (id: number | string) => {
+    const path = id === 'me' ? '/users/me' : `/users/${id}`;
+    const res = await request.get<any, unknown>(path);
+    const data = (res as any)?.data;
+    if (data && typeof data === 'object') {
+      return (data as any)?.data ?? data;
+    }
+    return (res as any)?.data ?? res;
+  },
 
-  // 关注用户
+  // 鍏虫敞鐢ㄦ埛
   followUser: (id: number | string) => 
     request.post<any, void>(`/users/${id}/follow`),
 
-  // 取消关注
+  // 鍙栨秷鍏虫敞
   unfollowUser: (id: number | string) => 
     request.delete<any, void>(`/users/${id}/follow`),
 };
